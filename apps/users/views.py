@@ -62,3 +62,19 @@ class LoginView(APIView):
         )
 
         return response
+
+
+class LogoutView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        response = Response(
+            {"detail": "Logged out successfully."},
+            status=200,
+        )
+
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+
+        return response
