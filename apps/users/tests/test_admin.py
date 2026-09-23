@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import User
+from apps.users.models import User
 
 
 class UserAdminTests(TestCase):
@@ -75,7 +75,7 @@ class UserAdminTests(TestCase):
         original_password = self.user.password
         response = self.client.post(reverse("admin:users_user_change", args=[self.user.pk]), {
             "email": self.user.email, "full_name": "Updated member", "phone": "", "locale": "en",
-            "is_active": "on", "is_staff": "on", "is_superuser": "on",
+            "first_name": "", "last_name": "", "is_active": "on", "is_staff": "on", "is_superuser": "on",
             "groups": [str(group.pk)], "user_permissions": [str(permission.pk)],
         })
         self.assertEqual(response.status_code, 302)

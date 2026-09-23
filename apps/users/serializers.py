@@ -1,3 +1,6 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password as django_validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from .models import User
@@ -9,9 +12,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "email",
+            "first_name",
+            "last_name",
             "phone",
             "full_name",
             "locale",
+            "date_joined",
             "created_at",
             "updated_at",
         )
@@ -31,10 +37,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = (
             "email",
             "password",
+            "first_name",
+            "last_name",
             "phone",
             "full_name",
             "locale",
         )
+
+    def validate_password(self, value):
+        try:
+            django_validate_password(value, user=User(email=self.initial_data.get("email", "")))
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages) from exc
+        return value
 
     def create(self, validated_data):
         password = validated_data.pop("password")
@@ -52,16 +67,13 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs["email"]
-        password = attrs["password"]
+        user = authenticate(
+            request=self.context.get("request"),
+            **attrs,
+        )
 
-        user = User.objects.filter(email=email).first()
-
-        if user is None or not user.check_password(password):
+        if user is None:
             raise serializers.ValidationError("Invalid email or password.")
-
-        if not user.is_active:
-            raise serializers.ValidationError("User is inactive.")
 
         attrs["user"] = user
         return attrs

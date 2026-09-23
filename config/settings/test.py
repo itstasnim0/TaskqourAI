@@ -2,6 +2,7 @@ from .base import *
 
 
 DEBUG = False
+AUTH_COOKIE_SECURE = False
 
 SECRET_KEY = "test-only-secret-key"
 
