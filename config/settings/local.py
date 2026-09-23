@@ -1,7 +1,3 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from .base import *  # noqa: E402,F403
 
 
@@ -13,4 +9,4 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+MAILERS["default"]["BACKEND"] = "django.core.mail.backends.console.EmailBackend"
