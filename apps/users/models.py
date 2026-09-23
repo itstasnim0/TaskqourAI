@@ -1,31 +1,37 @@
-import uuid
-
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.postgres.fields import CIEmailField
 from django.db import models
 
-from .managers import UserManager
+from apps.common.models import UUIDModel
+
+from .managers import CustomUserManager
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class CustomUser(UUIDModel, AbstractBaseUser, PermissionsMixin):
+    """Use email and stable UUID identity from the first project migration."""
 
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True)
-    full_name = models.CharField(max_length=255, blank=True)
+    email = CIEmailField(unique=True)
+    email.system_check_removed_details = None
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    full_name = models.CharField(max_length=150)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     email_verified_at = models.DateTimeField(null=True, blank=True)
-    locale = models.CharField(max_length=10, default="en")
+    locale = models.CharField(max_length=8, default="fa")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    objects = UserManager()
+    objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["full_name"]
 
-    def __str__(self):
+    class Meta:
+        ordering = ["email"]
+        db_table = "users_user"
+
+    def __str__(self) -> str:
         return self.email

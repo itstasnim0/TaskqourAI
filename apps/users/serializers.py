@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from .models import User
+from .models import CustomUser
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = (
             "id",
             "email",
@@ -27,7 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = (
             "email",
             "password",
@@ -38,7 +38,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        user = User.objects.create_user(
+        user = CustomUser.objects.create_user(
             password=password,
             **validated_data,
         )
@@ -55,7 +55,7 @@ class LoginSerializer(serializers.Serializer):
         email = attrs["email"]
         password = attrs["password"]
 
-        user = User.objects.filter(email=email).first()
+        user = CustomUser.objects.filter(email=email).first()
 
         if user is None or not user.check_password(password):
             raise serializers.ValidationError("Invalid email or password.")

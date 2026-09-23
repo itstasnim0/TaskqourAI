@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import include,path
 from .views import health_check
 
+from apps.users.models import CustomUser
+
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -26,6 +28,10 @@ from drf_spectacular.views import (
 
 
 urlpatterns = [
+    path(
+        "admin/users/user/add/",
+        admin.site.admin_view(admin.site._registry[CustomUser].add_view),
+    ),
     path('admin/', admin.site.urls),
     path("health/", health_check),
     path("api/users/", include("apps.users.urls")),
