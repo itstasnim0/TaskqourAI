@@ -1,6 +1,6 @@
 import pytest
 from django.conf import settings
-from .models import CustomUser
+from apps.users.models import CustomUser
 
 
 def test_auth_user_model_is_custom() -> None:
